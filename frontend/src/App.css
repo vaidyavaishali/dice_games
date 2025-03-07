@@ -1,0 +1,14 @@
+.image-height{
+    height: 20rem;
+}
+
+@media screen and (max-width:768px) {
+    .image-height{
+        height: 12rem;
+    }
+}
+
+.custom-scroll {
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent;
+}
