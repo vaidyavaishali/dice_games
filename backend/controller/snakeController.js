@@ -24,18 +24,28 @@ exports.createMatch = async (req, res) => {
 };
 
 
-
-// Update player score
 exports.updateScore = async (req, res) => {
     try {
-        // const { players } = req.body;
         const { matchId } = req.params; // matchId is actually _id in MongoDB
-        console.log(req.body, req.params)
-        // Find the match using _id
-        const match = await Match.findOne({ matchId: matchId });
+        const { players, winner } = req.body; // Expecting players array and winner object
+
+        // Find the match using matchId (_id in MongoDB)
+        const match = await Match.findOne({ matchId });
         if (!match) return res.status(404).json({ message: 'Match not found' });
 
-        match.players = req.body.players
+        // Update players' scores
+        match.players = players;
+
+        // If a winner is set, update their score
+        if (winner && winner.name) {
+            const playerIndex = match.players.findIndex(player => player.name === winner.name);
+            if (playerIndex !== -1) {
+                match.players[playerIndex].score = winner.score; // Update winner's score
+            }
+            match.winner = winner; // Update the winner field
+        }
+
+        // Save the updated match
         await match.save();
 
         res.json({ message: 'Score updated', match });
@@ -45,26 +55,6 @@ exports.updateScore = async (req, res) => {
     }
 };
 
-
-// // Determine and save winner
-// exports.determineWinner = async (req, res) => {
-//     try {
-//         // console.log("winner")
-//         const { winner } = req.body
-//         const { matchId } = req.params;
-
-//         const match = await Match.findOne({ matchId: matchId });
-//         if (!match) return res.status(404).json({ message: 'Match not found' });
-//         console.log(match)
-
-//         match.winner = req.body.winner;
-//         await match.save();
-
-//         res.json({ message: `Winner determined: ${winner.name}`, match });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
 
 
 
@@ -83,8 +73,10 @@ exports.determineWinner = async (req, res) => {
             return res.status(400).json({ message: 'Winner not found in the match' });
         }
 
+        console.log(playerIndex)
+
         // Increment the winner's score
-        match.players[playerIndex].score = winner.score;
+        match.players[playerIndex].score = match.players[playerIndex].score + 1;
 
         // Update the winner field in match
         match.winner = {
@@ -100,9 +92,6 @@ exports.determineWinner = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
-// Get match details
 exports.getMatchDetails = async (req, res) => {
     try {
         const { matchId } = req.params;

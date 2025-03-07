@@ -134,6 +134,7 @@ button:hover {
 .board {
   position: absolute;
   top: 0;
+  padding: 0px;
   left: 0;
   z-index: 1;
   width: 600px;
@@ -483,6 +484,7 @@ button:hover {
   align-items: center;
   padding: 0 6px;
   user-select: none;
+  color:black;
   background-color: #ffffff8e;
 }
 
@@ -635,6 +637,7 @@ button:hover {
   }
   .board {
     width: 100%;
+ 
   }
   .playersBox {
     border-radius: 0;
